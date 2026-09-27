@@ -35,7 +35,7 @@ kind: Service
 metadata:
   name: backend-service
 spec:
-  type: ClusterIP
+  type: ClusterIP # The service is accessible only within the Kubernetes cluster. External traffic is routed to this service through the Ingress Controller.
   selector:
     app: backend
   ports:

@@ -32,11 +32,10 @@ kind: Service
 metadata:
   name: frontend-service
 spec:
-  type: NodePort
+  type: ClusterIP # ingress.yml, # The service is accessible only within the Kubernetes cluster. External traffic is routed to this service through the Ingress Controller.
   selector:
     app: frontend
   ports:
     - protocol: TCP
-      port: 80
+      port: 3000
       targetPort: 80
-      nodePort: 30080
