@@ -1,0 +1,36 @@
+## Docker
+
+1. First, create a Dockerfile for each layer/service of the application:
+   - `Dockerfile.frontend`
+   - `Dockerfile.backend`
+   - `Dockerfile.database`
+
+2. Create a Docker Compose configuration to quickly build and run all services together.
+
+## Kubernetes
+
+1. Set up a Kubernetes cluster.
+
+2. Create a Deployment for each layer/service:
+   - `frontend-deployment`
+   - `backend-deployment`
+   - `database-deployment`
+
+3. Create Kubernetes Services for communication:
+   - Use `ClusterIP` for internal communication between services.
+   - Use `NodePort` or `LoadBalancer` for external access.
+   - Frontend → `NodePort` / `LoadBalancer`
+   - Backend → `NodePort` / `LoadBalancer`
+   - Database → `ClusterIP`
+
+4. Configure Ingress for the frontend and backend.
+
+5. Create a Kubernetes Secret for the database credentials:
+
+```bash
+kubectl create secret generic dbsecrets \
+  --from-literal=DB_HOST=database \
+  --from-literal=DB_USERNAME=todo_admin \
+  --from-literal=DB_PASSWORD=password \
+  --from-literal=DB_NAME=todo_app
+```
