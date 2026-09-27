@@ -4,21 +4,50 @@ metadata:
   name: frontend-deployment
   labels:
     app: frontend
+
 spec:
   replicas: 1
+
   selector:
     matchLabels:
       app: frontend
+
   template:
     metadata:
       labels:
         app: frontend
+
     spec:
+
+      # 1. Önce bu container çalışır
+      initContainers:
+        - name: fetch-index
+          image: curlimages/curl:latest
+
+          command:
+            - sh
+            - -c
+            - >
+              curl -fL
+              https://raw.githubusercontent.com/brhm/k8s_todo_project/master/frontend/index.html
+              -o /shared/index.html
+
+          volumeMounts:
+            - name: frontend-files
+              mountPath: /shared
+
+      # 2. initContainer bittikten sonra frontend başlar
       containers:
         - name: frontend
           image: brhmkskn/k8sproject_frontend:proje
+
           ports:
             - containerPort: 80
+
+          volumeMounts:
+            - name: frontend-files
+              mountPath: /usr/local/apache2/htdocs
+
           resources:
             requests:
               memory: "128Mi"
@@ -26,15 +55,24 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "500m"
+
+      # İki container'ın ortak kullandığı alan
+      volumes:
+        - name: frontend-files
+          emptyDir: {}
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: frontend-service
+
 spec:
-  type: ClusterIP # ingress.yml, # The service is accessible only within the Kubernetes cluster. External traffic is routed to this service through the Ingress Controller.
+  type: ClusterIP
+
   selector:
     app: frontend
+
   ports:
     - protocol: TCP
       port: 3000

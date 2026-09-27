@@ -3,6 +3,7 @@ kind: Ingress
 metadata:
   name: my-ingress
 spec:
+  ingressClassName: nginx
   rules:
     - host: backend.todo.com
       http:
