@@ -1,9 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend-deployment
-  labels:
-    app: backend
+  name: backend
 spec:
   replicas: 1
   selector:
@@ -17,18 +15,22 @@ spec:
       containers:
         - name: backend
           image: brhmkskn/k8sproject_backend:proje
+
           ports:
             - containerPort: 80
-          resources:
-            requests:
-              memory: "128Mi"
-              cpu: "250m"
-            limits:
-              memory: "512Mi"
-              cpu: "500m"
+
           envFrom:
             - secretRef:
                 name: dbsecret
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
 ---
 apiVersion: v1
 kind: Service

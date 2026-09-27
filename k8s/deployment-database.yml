@@ -1,9 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: database-deployment
-  labels:
-    app: database
+  name: database
 spec:
   replicas: 1
   selector:
@@ -17,50 +15,49 @@ spec:
       containers:
         - name: database
           image: brhmkskn/k8sproject_database:proje
-          ports:
-            - containerPort: 3306
+
           env:
             - name: MYSQL_DATABASE
-              value: "todo_app"
+              valueFrom:
+                secretKeyRef:
+                  name: dbsecret
+                  key: DB_NAME
+
             - name: MYSQL_USER
-              value: "todo_admin"
+              valueFrom:
+                secretKeyRef:
+                  name: dbsecret
+                  key: DB_USERNAME
+
             - name: MYSQL_PASSWORD
-              value: "password"
+              valueFrom:
+                secretKeyRef:
+                  name: dbsecret
+                  key: DB_PASSWORD
+
             - name: MYSQL_ALLOW_EMPTY_PASSWORD
-              value: "1"
+              value: "yes"
+
+          ports:
+            - containerPort: 3306
+
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+
           resources:
             requests:
+              cpu: "100m"
               memory: "256Mi"
-              cpu: "250m"
             limits:
-              memory: "1Gi"
               cpu: "500m"
-          volumeMounts:
-            - name: persistent-storage
-              mountPath: /var/lib/mysql
+              memory: "512Mi"
+
       volumes:
-        - name: persistent-storage
+        - name: mysql-data
           persistentVolumeClaim:
-            claimName: ebs-claim
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: ebs-sc
-  provisioner: ebs.csi.aws.com
-  volumebindingMode: WaitForFirstConsumer
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: ebs-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: ebs-sc
-  resources:
-    requests:
-      storage: 4Gi
+            claimName: mysql-pvc
+
 ---
 apiVersion: v1
 kind: Service
@@ -74,4 +71,3 @@ spec:
     - protocol: TCP
       port: 3306
       targetPort: 3306
----
