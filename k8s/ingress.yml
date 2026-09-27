@@ -10,14 +10,14 @@ spec:
   rules:
     - http:
         paths:
-          - path: /api(/|$)(.*)
+          - path: api.todo.com(/|$)(.*)
             pathType: ImplementationSpecific
             backend:
               service:
                 name: backend-service
                 port:
                   number: 5000
-          - path: /
+          - path: brhm.todo.com
             pathType: Prefix
             backend:
               service:
