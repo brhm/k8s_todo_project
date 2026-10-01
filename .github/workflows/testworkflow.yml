@@ -1,0 +1,25 @@
+name: Test Workflow
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    name: Validate and build Docker images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Validate Docker Compose configuration
+        run: docker compose -f docker-compose.yml config --quiet
+      - name: Build backend image
+        run: docker build -f Dockerfile.backend -t k8sproject-backend:test .
+      - name: Build frontend image
+        run: docker build -f Dockerfile.frontend -t k8sproject-frontend:test .
+      - name: Build database image
+        run: docker build -f Dockerfile.database -t k8sproject-database:test .
